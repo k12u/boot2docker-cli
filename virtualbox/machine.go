@@ -27,15 +27,12 @@ const (
 	F_rtcuseutc
 	F_cpuhotplug
 	F_pae
-	F_longmode
 	F_synthcpu
 	F_hpet
 	F_hwvirtex
-	F_triplefaultreset
 	F_nestedpaging
 	F_largepages
 	F_vtxvpid
-	F_vtxux
 	F_accelerate3d
 )
 
@@ -474,7 +471,6 @@ func CreateMachine(mc *driver.MachineConfig) (*Machine, error) {
 	m.SerialFile = mc.SerialFile
 
 	m.Flag |= F_pae
-	m.Flag |= F_longmode // important: use x86-64 processor
 	m.Flag |= F_rtcuseutc
 	m.Flag |= F_acpi
 	m.Flag |= F_ioapic
@@ -647,15 +643,12 @@ func (m *Machine) Modify() error {
 		"--rtcuseutc", m.Flag.Get(F_rtcuseutc),
 		"--cpuhotplug", m.Flag.Get(F_cpuhotplug),
 		"--pae", m.Flag.Get(F_pae),
-		"--longmode", m.Flag.Get(F_longmode),
 		"--synthcpu", m.Flag.Get(F_synthcpu),
 		"--hpet", m.Flag.Get(F_hpet),
 		"--hwvirtex", m.Flag.Get(F_hwvirtex),
-		"--triplefaultreset", m.Flag.Get(F_triplefaultreset),
 		"--nestedpaging", m.Flag.Get(F_nestedpaging),
 		"--largepages", m.Flag.Get(F_largepages),
 		"--vtxvpid", m.Flag.Get(F_vtxvpid),
-		"--vtxux", m.Flag.Get(F_vtxux),
 		"--accelerate3d", m.Flag.Get(F_accelerate3d),
 	}
 
@@ -708,9 +701,6 @@ func (m *Machine) AddStorageCtl(name string, ctl driver.StorageController) error
 	args := []string{"storagectl", m.Name, "--name", name}
 	if ctl.SysBus != "" {
 		args = append(args, "--add", string(ctl.SysBus))
-	}
-	if ctl.Ports > 0 {
-		args = append(args, "--portcount", fmt.Sprintf("%d", ctl.Ports))
 	}
 	if ctl.Chipset != "" {
 		args = append(args, "--controller", string(ctl.Chipset))
